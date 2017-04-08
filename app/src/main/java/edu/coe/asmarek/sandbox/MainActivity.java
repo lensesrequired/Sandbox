@@ -1,7 +1,12 @@
 package edu.coe.asmarek.sandbox;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,17 +23,28 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
     Spinner colors;
+    ArrayList<String> colorsList;
     Button submit;
     Button remember;
+
+    SensorManager smgr;
+    Sensor acc;
+    ArrayList<Float> lastVals;
+    long lastTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         String theme = getIntent().getStringExtra("theme");
-        if (theme == null)
-            theme = "Default";
+        if (theme == null) {
+            SharedPreferences s = getSharedPreferences("myFile", 0);
+            theme = s.getString("theme", "Default");
+        }
 
         switch (theme) {
             case "Black":
@@ -75,11 +91,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         setButtons();
+        setColorSpinner(theme);
 
-        colors = (Spinner) findViewById(R.id.spnColors);
-        String[] items = new String[]{"Black", "Blue", "Green", "Orange", "Pink", "Purple", "Red", "White", "Yellow"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        colors.setAdapter(adapter);
+        setSensors();
+    }
+
+    @Override
+    protected void onResume() {
+        smgr.registerListener(this, acc, SensorManager.SENSOR_DELAY_NORMAL);
+
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        smgr.unregisterListener(this, acc);
+
+        super.onPause();
+    }
+
+    private void setSensors() {
+        smgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+        acc = smgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        lastVals = new ArrayList<Float>(Arrays.asList((float)0,(float)0,(float)0));
+        lastTime = System.currentTimeMillis();
     }
 
     @Override
@@ -97,8 +133,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case (R.id.action_theme):
+                Intent i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
+                startActivity(i);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -112,54 +151,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         remember.setOnClickListener(this);
     }
 
+    private void setColorSpinner(String theme) {
+        colors = (Spinner) findViewById(R.id.spnColors);
+        colorsList = new ArrayList<String>(Arrays.asList("Black", "Blue", "Green", "Orange",
+                "Pink", "Purple", "Red", "White", "Yellow"));
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_dropdown_item, colorsList);
+        colors.setAdapter(adapter);
+        int pos;
+        if (theme != "Default") {
+            pos = colorsList.indexOf(theme);
+        } else {
+            pos = 0;
+        }
+        colors.setSelection(pos);
+    }
+
     @Override
     public void onClick(View v) {
         String color = colors.getSelectedItem().toString();
         Intent i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
         switch (v.getId()) {
             case R.id.btnSubmit:
-                switch (color) {
-                    case "Black":
-                        this.setTheme(R.style.BlackTheme_NoActionBar);
-                        i.putExtra("theme", "Black");
-                        startActivity(i);
-                        break;
-                    case "Blue":
-                        this.setTheme(R.style.BlueTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Blue"));
-                        break;
-                    case "Green":
-                        this.setTheme(R.style.GreenTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Green"));
-                        break;
-                    case "Orange":
-                        this.setTheme(R.style.OrangeTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Orange"));
-                        break;
-                    case "Pink":
-                        this.setTheme(R.style.PinkTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Pink"));
-                        break;
-                    case "Purple":
-                        this.setTheme(R.style.PurpleTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Purple"));
-                        break;
-                    case"Red":
-                        this.setTheme(R.style.RedTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Red"));
-                        break;
-                    case "White":
-                        this.setTheme(R.style.WhiteTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "White"));
-                        break;
-                    case "Yellow":
-                        this.setTheme(R.style.YellowTheme_NoActionBar);
-                        startActivity(new Intent(getIntent()).putExtra("theme", "Yellow"));
-                        break;
-                }
+                i.putExtra("theme", color);
+                startActivity(i);
                 break;
             case R.id.btnRemember:
+                SharedPreferences s = getSharedPreferences("myFile", 0);
+                SharedPreferences.Editor e = s.edit();
+                e.putString("theme", color);
+                e.commit();
+                Toast.makeText(this, "Color preference saved", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_ACCELEROMETER:
+                if(shake(event)) {
+                    String c = colorsList.get((int)(Math.random()*colorsList.size()));
+                    Intent i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
+                    i.putExtra("theme", c);
+                    startActivity(i);
+                }
+                break;
+        }
+    }
+
+    private boolean shake(SensorEvent event) {
+        if(lastVals.get(0) == 0 && lastVals.get(1) == 0 && lastVals.get(2) == 0) {
+            lastVals.set(0, event.values[0]);
+            lastVals.set(1, event.values[1]);
+            lastVals.set(2, event.values[2]);
+        } else {
+            long currTime = System.currentTimeMillis();
+            if(currTime - lastTime > 150) {
+                long diffTime = currTime - lastTime;
+                lastTime = currTime;
+
+                float speed = Math.abs(event.values[0]+event.values[1]+event.values[2]
+                        - lastVals.get(0) - lastVals.get(1) - lastVals.get(2)) / diffTime * 10000;
+
+                if (speed > 800) {
+                    return true;
+                }
+
+                lastVals.set(0, event.values[0]);
+                lastVals.set(1, event.values[1]);
+                lastVals.set(2, event.values[2]);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
