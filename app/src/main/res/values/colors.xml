@@ -7,4 +7,7 @@
     <color name="colorYellow_dark">#958c00</color>
     <color name="colorPurple_dark">#4f2592</color>
     <color name="colorPink_light">#ff7eaa</color>
+    <color name="colorBackground">#31A1FF</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

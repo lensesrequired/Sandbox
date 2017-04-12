@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:title="Theme Picker"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_customBackground"
+        android:orderInCategory="200"
+        android:title="Photo View"
+        app:showAsAction="never"
+        />
 </menu>

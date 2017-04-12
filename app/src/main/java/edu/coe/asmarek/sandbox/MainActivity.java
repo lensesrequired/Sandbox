@@ -131,11 +131,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        Intent i;
 
         //noinspection SimplifiableIfStatement
         switch (id) {
             case (R.id.action_theme):
-                Intent i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
+                i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
+                startActivity(i);
+                break;
+            case (R.id.action_customBackground):
+                i = new Intent("edu.coe.asmarek.sandbox.GetPhoto");
                 startActivity(i);
                 break;
         }
