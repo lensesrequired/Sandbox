@@ -19,18 +19,20 @@ public class TimeKeeper extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
+        CharSequence name = TimeKeeperConfigureActivity.loadNamePref(context, appWidgetId);
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        TimeKeeperConfigureActivity.saveTitlePref(context, appWidgetId,
-                TimeKeeperConfigureActivity.loadNamePref(context, appWidgetId),
-                sdf.format(cal.getTime()));
-
-        CharSequence name = TimeKeeperConfigureActivity.loadNamePref(context, appWidgetId);
+        String t;
+        if(TimeKeeperConfigureActivity.loadBooleanPref(context, appWidgetId)) {
+            t = TimeKeeperConfigureActivity.loadTimePref(context, appWidgetId);
+        } else {
+            t = sdf.format(cal.getTime());
+        }
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.time_keeper);
         views.setTextViewText(R.id.txtName, name);
-        views.setTextViewText(R.id.txtTime, sdf.format(cal.getTime()));
+        views.setTextViewText(R.id.txtTime, t);
 
         Intent intent = new Intent(context, TimeKeeper.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -43,6 +45,10 @@ public class TimeKeeper extends AppWidgetProvider {
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+
+        TimeKeeperConfigureActivity.saveTitlePref(context, appWidgetId,
+                TimeKeeperConfigureActivity.loadNamePref(context, appWidgetId),
+                sdf.format(cal.getTime()), false);
     }
 
     @Override

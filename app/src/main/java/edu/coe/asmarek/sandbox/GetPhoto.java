@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -99,39 +100,47 @@ public class GetPhoto extends AppCompatActivity implements View.OnClickListener 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap photoBitmap;
-        if(requestCode == 0) {
-            if(gallery.getText().toString().equals("Another! (Gallery)"))
-            {
-                ImageView imageView = new ImageView(this);
-                try {
-                    InputStream is = getContentResolver().openInputStream(data.getData());
-                    photoBitmap = BitmapFactory.decodeStream(is);
-                    imageView.setImageBitmap(photoBitmap);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                photoLayout.addView(imageView);
+        try {
+            if (requestCode == 0) {
+                if (gallery.getText().toString().equals("Another! (Gallery)")) {
+                    ImageView imageView = new ImageView(this);
+                    try {
+                        InputStream is = getContentResolver().openInputStream(data.getData());
+                        photoBitmap = BitmapFactory.decodeStream(is);
+                        imageView.setImageBitmap(photoBitmap);
+                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    photoLayout.addView(imageView);
 
-            } else {
-                try {
-                    InputStream is = getContentResolver().openInputStream(data.getData());
-                    photoBitmap = BitmapFactory.decodeStream(is);
-                    photo.setImageBitmap(photoBitmap);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                } else {
+                    try {
+                        InputStream is = getContentResolver().openInputStream(data.getData());
+                        photoBitmap = BitmapFactory.decodeStream(is);
+                        photo.setImageBitmap(photoBitmap);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        } else {
-            if(camera.getText().toString().equals("Another! (Camera)"))
-            {
-
             } else {
                 photoBitmap = (Bitmap) data.getExtras().get("data");
-                photo.setImageBitmap(photoBitmap);
+                if (camera.getText().toString().equals("Another! (Camera)")) {
+                    ImageView imageView = new ImageView(this);
+                    imageView.setImageBitmap(photoBitmap);
+                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+                    photoLayout.addView(imageView);
+                } else {
+                    photo.setImageBitmap(photoBitmap);
+                }
             }
-        }
 
-        gallery.setText("Another! (Gallery)");
-        camera.setText("Another! (Camera)");
+            gallery.setText("Another! (Gallery)");
+            camera.setText("Another! (Camera)");
+        } catch (Exception e) {
+
+        }
     }
 }
