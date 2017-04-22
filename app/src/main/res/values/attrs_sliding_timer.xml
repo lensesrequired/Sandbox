@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="SlidingTimer">
+        <attr name="length" format="integer" />
+    </declare-styleable>
+</resources>

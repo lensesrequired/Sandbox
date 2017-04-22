@@ -52,4 +52,6 @@
         <item>50</item>
         <item>55</item>
     </string-array>
+    <string name="title_activity_animation">AnimationActivity</string>
+    <string name="title_activity_timers">TimersActivity</string>
 </resources>

@@ -61,6 +61,10 @@ public class GetPhoto extends AppCompatActivity implements View.OnClickListener 
                 i = new Intent("edu.coe.asmarek.sandbox.GetPhoto");
                 startActivity(i);
                 break;
+            case (R.id.action_timers):
+                i = new Intent("edu.coe.asmarek.sandbox.TimersActivity");
+                startActivity(i);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -100,47 +104,19 @@ public class GetPhoto extends AppCompatActivity implements View.OnClickListener 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap photoBitmap;
-        try {
+        if(resultCode == RESULT_OK) {
             if (requestCode == 0) {
-                if (gallery.getText().toString().equals("Another! (Gallery)")) {
-                    ImageView imageView = new ImageView(this);
-                    try {
-                        InputStream is = getContentResolver().openInputStream(data.getData());
-                        photoBitmap = BitmapFactory.decodeStream(is);
-                        imageView.setImageBitmap(photoBitmap);
-                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    photoLayout.addView(imageView);
-
-                } else {
-                    try {
-                        InputStream is = getContentResolver().openInputStream(data.getData());
-                        photoBitmap = BitmapFactory.decodeStream(is);
-                        photo.setImageBitmap(photoBitmap);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                photoBitmap = (Bitmap) data.getExtras().get("data");
-                if (camera.getText().toString().equals("Another! (Camera)")) {
-                    ImageView imageView = new ImageView(this);
-                    imageView.setImageBitmap(photoBitmap);
-                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
-                    photoLayout.addView(imageView);
-                } else {
+                try {
+                    InputStream is = getContentResolver().openInputStream(data.getData());
+                    photoBitmap = BitmapFactory.decodeStream(is);
                     photo.setImageBitmap(photoBitmap);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
+            } else if (requestCode == 1) {
+                photoBitmap = (Bitmap) data.getExtras().get("data");
+                photo.setImageBitmap(photoBitmap);
             }
-
-            gallery.setText("Another! (Gallery)");
-            camera.setText("Another! (Camera)");
-        } catch (Exception e) {
-
         }
     }
 }

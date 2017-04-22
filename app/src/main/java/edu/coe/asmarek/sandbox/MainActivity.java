@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> colorsList;
     Button submit;
     Button remember;
+    ImageButton mic;
 
     SensorManager smgr;
     Sensor acc;
@@ -143,6 +146,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 i = new Intent("edu.coe.asmarek.sandbox.GetPhoto");
                 startActivity(i);
                 break;
+            case (R.id.action_timers):
+                i = new Intent("edu.coe.asmarek.sandbox.TimersActivity");
+                startActivity(i);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -151,9 +158,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setButtons() {
         submit = (Button) findViewById(R.id.btnSubmit);
         remember = (Button) findViewById(R.id.btnRemember);
+        mic = (ImageButton) findViewById(R.id.imgMic);
 
         submit.setOnClickListener(this);
         remember.setOnClickListener(this);
+        mic.setOnClickListener(this);
     }
 
     private void setColorSpinner(String theme) {
@@ -188,6 +197,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.commit();
                 Toast.makeText(this, "Color preference saved", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.imgMic:
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+                startActivityForResult(intent, 2);
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2 && resultCode == RESULT_OK) {
+            Intent i = new Intent("edu.coe.asmarek.sandbox.MainActivity");
+            ArrayList<String> matches = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            for(String m:
+                    matches) {
+                switch (m) {
+                    case "black":
+                        i.putExtra("theme", "Black");
+                        startActivity(i);
+                        break;
+                    case "blue":
+                        i.putExtra("theme", "Blue");
+                        startActivity(i);
+                        break;
+                    case "green":
+                        i.putExtra("theme", "Green");
+                        startActivity(i);
+                        break;
+                    case "orange":
+                        i.putExtra("theme", "Orange");
+                        startActivity(i);
+                        break;
+                    case "pink":
+                        i.putExtra("theme", "Pink");
+                        startActivity(i);
+                        break;
+                    case "purple":
+                        i.putExtra("theme", "Purple");
+                        startActivity(i);
+                        break;
+                    case"red":
+                        i.putExtra("theme", "Red");
+                        startActivity(i);
+                        break;
+                    case "white":
+                        i.putExtra("theme", "White");
+                        startActivity(i);
+                        break;
+                    case "yellow":
+                        i.putExtra("theme", "Yellow");
+                        startActivity(i);
+                        break;
+                }
+            }
         }
     }
 

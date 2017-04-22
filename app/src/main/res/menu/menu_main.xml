@@ -13,4 +13,10 @@
         android:title="Photo View"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/action_timers"
+        android:orderInCategory="300"
+        android:title="Timers"
+        app:showAsAction="never"
+        />
 </menu>
