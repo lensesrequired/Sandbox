@@ -30,16 +30,16 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
-    Spinner colors;
-    ArrayList<String> colorsList;
-    Button submit;
-    Button remember;
-    ImageButton mic;
+    private Spinner colors;
+    private ArrayList<String> colorsList;
+    private Button submit;
+    private Button remember;
+    private ImageButton mic;
 
-    SensorManager smgr;
-    Sensor acc;
-    ArrayList<Float> lastVals;
-    long lastTime;
+    private SensorManager smgr;
+    private Sensor acc;
+    private ArrayList<Float> lastVals;
+    private long lastTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +148,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case (R.id.action_timers):
                 i = new Intent("edu.coe.asmarek.sandbox.TimersActivity");
+                startActivity(i);
+                break;
+            case (R.id.action_animation):
+                i = new Intent("edu.coe.asmarek.sandbox.AnimationActivity");
                 startActivity(i);
                 break;
         }

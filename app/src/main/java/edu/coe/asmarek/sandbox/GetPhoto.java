@@ -65,6 +65,10 @@ public class GetPhoto extends AppCompatActivity implements View.OnClickListener 
                 i = new Intent("edu.coe.asmarek.sandbox.TimersActivity");
                 startActivity(i);
                 break;
+            case (R.id.action_animation):
+                i = new Intent("edu.coe.asmarek.sandbox.AnimationActivity");
+                startActivity(i);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
